@@ -1,0 +1,100 @@
+<div class="container mt-4">
+  <h1 class="mb-4">Locker Stations</h1>
+
+  <!-- Filter bar -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+
+        <div class="col-md-3">
+          <label for="area" class="form-label">Area</label>
+          <select id="area" class="form-select" [(ngModel)]="filters.area">
+            <option value="">All areas</option>
+            @for (area of areas; track area) {
+              <option [value]="area">{{ area }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label for="size" class="form-label">Locker size</label>
+          <select id="size" class="form-select" [(ngModel)]="filters.size">
+            <option value="">Any size</option>
+            @for (size of sizes; track size) {
+              <option [value]="size">{{ size }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label for="facility" class="form-label">Facility</label>
+          <select id="facility" class="form-select" [(ngModel)]="filters.facility">
+            <option value="">Any facility</option>
+            @for (facility of facilities; track facility) {
+              <option [value]="facility">{{ facility }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <div class="form-check">
+            <input id="open24" type="checkbox" class="form-check-input" [(ngModel)]="filters.open24">
+            <label for="open24" class="form-check-label">Open 24 hours</label>
+          </div>
+        </div>
+
+        <div class="col-md-2 d-flex gap-2">
+          <button class="btn btn-primary w-100" (click)="applyFilters()">Search</button>
+          <button class="btn btn-outline-secondary w-100" (click)="clearFilters()">Clear</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+
+  @if (!errorMessage) {
+    <p class="text-muted">{{ totalResults }} stations found</p>
+  }
+
+  @if (!errorMessage && station_list.length === 0) {
+    <div class="alert alert-info">No stations match these filters. Try removing one.</div>
+  }
+
+  <div class="row">
+    @for (station of station_list; track station.station_id) {
+      <div class="col-md-6 col-lg-4">
+        <div class="card mb-3" style="cursor: pointer"
+             [routerLink]="['/stations', station.station_id]">
+          <div class="card-header fw-bold">{{ station.name }}</div>
+          <div class="card-body">
+            <p class="mb-1">{{ station.address }}</p>
+            <p class="mb-0 text-muted">{{ station.lockers.length }} lockers</p>
+          </div>
+          <div class="card-footer">
+            @if (station.open_24_hours) {
+              Open 24 hours
+            } @else {
+              {{ station.opening_hours.open }} - {{ station.opening_hours.close }}
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (totalPages > 1) {
+    <div class="row align-items-center mb-4">
+      <div class="col-4">
+        <button class="btn btn-primary" (click)="previousPage()" [disabled]="page === 1">Previous</button>
+      </div>
+      <div class="col-4 text-center">Page {{ page }} of {{ totalPages }}</div>
+      <div class="col-4 text-end">
+        <button class="btn btn-primary" (click)="nextPage()" [disabled]="page === totalPages">Next</button>
+      </div>
+    </div>
+  }
+</div>

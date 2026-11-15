@@ -1,0 +1,54 @@
+<div class="container mt-4">
+  <a [routerLink]="['/stations']">&larr; Back to stations</a>
+
+  @if (errorMessage) {
+    <div class="alert alert-danger mt-3">{{ errorMessage }}</div>
+  }
+
+  @if (station) {
+    <div class="card mt-3 mb-4">
+      <div class="card-header bg-primary text-white">
+        <h2 class="h4 mb-0">{{ station.name }}</h2>
+      </div>
+      <div class="card-body">
+        <p class="mb-1">{{ station.address }}</p>
+        <p class="mb-1">
+          @if (station.open_24_hours) {
+            Open 24 hours
+          } @else {
+            Open {{ station.opening_hours.open }} - {{ station.opening_hours.close }}
+          }
+        </p>
+        <p class="mb-0 text-muted">Facilities: {{ station.facilities.join(', ') }}</p>
+      </div>
+    </div>
+
+    <h3 class="h5">Lockers</h3>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Locker</th>
+          <th>Size</th>
+          <th>Price per hour</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (locker of station.lockers; track locker.locker_id) {
+          <tr>
+            <td>{{ locker.locker_number }}</td>
+            <td>{{ locker.size }}</td>
+            <td>£{{ (locker.hourly_rate_pence / 100).toFixed(2) }}</td>
+            <td>
+              @if (locker.status === 'available') {
+                <span class="badge bg-success">Available</span>
+              } @else {
+                <span class="badge bg-secondary">Out of service</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
