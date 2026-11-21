@@ -1,0 +1,59 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card">
+        <div class="card-body p-4">
+          <h1 class="h3 mb-4">Create an account</h1>
+
+          @if (errorMessage) {
+            <div class="alert alert-danger" role="alert">{{ errorMessage }}</div>
+          }
+
+          <form #registerForm="ngForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="name" class="form-label">Full name</label>
+              <input id="name" name="name" type="text" class="form-control"
+                     [(ngModel)]="name" #nameInput="ngModel" required maxlength="100">
+              @if (nameInput.invalid && nameInput.touched) {
+                <div class="text-danger small mt-1">Please enter your name.</div>
+              }
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input id="email" name="email" type="email" class="form-control"
+                     [(ngModel)]="email" #emailInput="ngModel" required email>
+              @if (emailInput.invalid && emailInput.touched) {
+                <div class="text-danger small mt-1">Please enter a valid email address.</div>
+              }
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input id="password" name="password" type="password" class="form-control"
+                     [(ngModel)]="password" #passwordInput="ngModel" required minlength="8">
+              @if (passwordInput.invalid && passwordInput.touched) {
+                <div class="text-danger small mt-1">Password must be at least 8 characters.</div>
+              }
+            </div>
+
+            <div class="mb-4">
+              <label for="confirmPassword" class="form-label">Confirm password</label>
+              <input id="confirmPassword" name="confirmPassword" type="password" class="form-control"
+                     [(ngModel)]="confirmPassword" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100"
+                    [disabled]="registerForm.invalid || loading">
+              {{ loading ? 'Creating account...' : 'Register' }}
+            </button>
+          </form>
+
+          <p class="mt-3 mb-0 text-center">
+            Already have an account? <a [routerLink]="['/login']">Log in</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
