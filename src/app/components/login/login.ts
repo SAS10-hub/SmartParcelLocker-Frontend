@@ -16,6 +16,7 @@ export class Login {
   errorMessage: string = '';
   successMessage: string = '';
   loading: boolean = false;
+  returnUrl: string = '/stations';
 
   constructor(private auth: Auth,
               private router: Router,
@@ -30,6 +31,11 @@ export class Login {
     if (this.route.snapshot.queryParamMap.get('expired')) {
       this.errorMessage = 'Your session has expired. Please log in again.';
     }
+    // Sent here by the guard: go back to that page after logging in
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (returnUrl) {
+      this.returnUrl = returnUrl;
+    }
   }
 
   onSubmit() {
@@ -43,10 +49,10 @@ export class Login {
         this.auth.getProfile().subscribe({
           next: (profile: any) => {
             this.auth.saveName(profile.name);
-            this.router.navigate(['/stations']);
+            this.router.navigateByUrl(this.returnUrl);
           },
           error: () => {
-            this.router.navigate(['/stations']);
+            this.router.navigateByUrl(this.returnUrl);
           }
         });
       },

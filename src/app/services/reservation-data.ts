@@ -28,4 +28,27 @@ export class ReservationData {
     formData.append('end_time', end);
     return this.http.post<any>(this.apiUrl + '/reservations', formData);
   }
+    // GET /reservations?pn=1&ps=5&status=confirmed - my bookings
+  getMyReservations(page: number, status: string): Observable<any> {
+    let params = new HttpParams()
+      .set('pn', page)
+      .set('ps', 5);
+    if (status) {
+      params = params.set('status', status);
+    }
+    return this.http.get<any>(this.apiUrl + '/reservations', { params });
+  }
+
+  // PATCH /reservations/{id}/cancel
+  cancelReservation(id: string): Observable<any> {
+    return this.http.patch<any>(this.apiUrl + '/reservations/' + id + '/cancel', null);
+  }
+
+  // PUT /reservations/{id} - move the booking to a new time
+  rescheduleReservation(id: string, start: string, end: string): Observable<any> {
+    const formData = new FormData();
+    formData.append('start_time', start);
+    formData.append('end_time', end);
+    return this.http.put<any>(this.apiUrl + '/reservations/' + id, formData);
+  }
 }

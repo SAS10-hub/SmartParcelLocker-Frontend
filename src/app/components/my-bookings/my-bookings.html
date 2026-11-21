@@ -1,0 +1,103 @@
+<div class="container mt-4 mb-5">
+  <h1 class="mb-4">My bookings</h1>
+
+  <div class="row g-2 align-items-end mb-3">
+    <div class="col-sm-4 col-md-3">
+      <label for="status" class="form-label">Status</label>
+      <select id="status" class="form-select" [(ngModel)]="statusFilter" (ngModelChange)="applyFilter()">
+        <option value="">All bookings</option>
+        @for (s of statuses; track s) {
+          <option [value]="s">{{ s }}</option>
+        }
+      </select>
+    </div>
+    <div class="col text-muted">{{ totalResults }} bookings</div>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger" role="alert">{{ errorMessage }}</div>
+  }
+
+  @if (!errorMessage && reservations.length === 0) {
+    <div class="alert alert-info">
+      No bookings yet. <a [routerLink]="['/stations']">Find a locker</a>
+    </div>
+  }
+
+  @for (r of reservations; track r.reservation_id) {
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>{{ r.reservation_id }}</strong>
+        <span class="badge" [ngClass]="statusClass(r.status)">{{ r.status }}</span>
+      </div>
+      <div class="card-body">
+        <p class="mb-1">
+          Station <a [routerLink]="['/stations', r.station_id]">{{ r.station_id }}</a>,
+          locker {{ r.locker_id }}
+        </p>
+        <p class="mb-1">
+          {{ r.start_time | date:'EEE d MMM y, HH:mm' }} &ndash; {{ r.end_time | date:'HH:mm' }}
+          ({{ r.price_breakdown.booked_hours }} h)
+        </p>
+        <p class="mb-0">Total: <strong>{{ pounds(r.price_breakdown.final_amount_pence) }}</strong></p>
+
+        @if (canChange(r)) {
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-sm btn-outline-primary" (click)="startReschedule(r)">Reschedule</button>
+            <button class="btn btn-sm btn-outline-danger" (click)="cancel(r)">Cancel</button>
+          </div>
+        }
+
+        <!-- Reschedule form for this booking -->
+        @if (editingId === r.reservation_id) {
+          <div class="border rounded p-3 mt-3 bg-light">
+            <div class="row g-2">
+              <div class="col-md-4">
+                <label for="editDate" class="form-label">New date</label>
+                <input id="editDate" type="date" class="form-control" [(ngModel)]="editDate">
+              </div>
+              <div class="col-md-4">
+                <label for="editHour" class="form-label">Start time</label>
+                <select id="editHour" class="form-select" [(ngModel)]="editHour">
+                  @for (h of hourOptions; track h) {
+                    <option [ngValue]="h">{{ h < 10 ? '0' + h : h }}:00</option>
+                  }
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="editHours" class="form-label">Duration</label>
+                <select id="editHours" class="form-select" [(ngModel)]="editHours">
+                  @for (d of durationOptions; track d) {
+                    <option [ngValue]="d">{{ d }} {{ d === 1 ? 'hour' : 'hours' }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+            @if (editError) {
+              <div class="alert alert-danger mt-2 mb-0" role="alert">{{ editError }}</div>
+            }
+            <div class="d-flex gap-2 mt-3">
+              <button class="btn btn-sm btn-primary" (click)="saveReschedule(r)">Save new time</button>
+              <button class="btn btn-sm btn-outline-secondary" (click)="closeReschedule()">Close</button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (totalPages > 1) {
+    <div class="row align-items-center">
+      <div class="col-4">
+        <button class="btn btn-primary" (click)="previousPage()" [disabled]="page === 1">Previous</button>
+      </div>
+      <div class="col-4 text-center">Page {{ page }} of {{ totalPages }}</div>
+      <div class="col-4 text-end">
+        <button class="btn btn-primary" (click)="nextPage()" [disabled]="page === totalPages">Next</button>
+      </div>
+    </div>
+  }
+</div>
